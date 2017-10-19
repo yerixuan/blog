@@ -1,0 +1,10 @@
+eclipse.preferences.version=1
+encoding//src/entity/Article.java=gbk
+encoding//src/entity/Comment.java=gbk
+encoding//src/entity/Jurisdiction.java=gbk
+encoding//src/entity/Mail.java=gbk
+encoding//src/entity/Notice.java=gbk
+encoding//src/entity/Role.java=gbk
+encoding//src/entity/UserInfo.java=gbk
+encoding//src/util/CreateIdentifyingCode.java=gbk
+encoding/<project>=utf-8

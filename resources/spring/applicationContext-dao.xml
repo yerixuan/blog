@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+	   http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd
+	   http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd">
+
+    <!-- 自动扫描dao包 -->
+    <context:component-scan base-package="com.crawler.dao"/>
+     <context:component-scan base-package="dao"/>
+
+
+    <!-- 加载配置文件 -->
+    <context:property-placeholder location="classpath:resource/*.properties"/>
+    <!-- 数据库连接池 -->
+    <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource"
+          destroy-method="close">
+        <property name="url" value="${jdbc.url}"/>
+        <property name="username" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+        <property name="driverClassName" value="${jdbc.driver}"/>
+        <property name="maxActive" value="10"/>
+        <property name="minIdle" value="5"/>
+    </bean>
+
+
+    <!-- 配置sessionFactory -->
+   <bean id="sessionFactory"
+		class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="hibernateProperties">
+			<value>
+				hibernate.dialect=org.hibernate.dialect.MySQL5Dialect
+				<!-- cureentSesssion -->
+				hibernate.current_session_context_class=org.springframework.orm.hibernate4.SpringSessionContext
+				<!-- Second-level caching -->
+				hibernate.cache.use_second_level_cache=true<!-- 启用二级缓存 -->
+				hibernate.cache.use_query_cache=true<!-- 配置启用查询缓存 -->
+				hibernate.cache.region.factory_class=org.hibernate.cache.ehcache.SingletonEhCacheRegionFactory
+				hibernate.cache.provider_configuration_file_resource_path=/ehcache.xml
+				<!-- sql -->
+				hibernate.show_sql = false
+				hibernate.format_sql = false
+				hibernate.hbm2ddl.auto = update
+			</value>
+		</property>
+		<property name="packagesToScan">
+			<array>
+				<value>entity</value>
+			</array>
+		</property>
+	</bean>
+	
+	<bean id="hibernateTemplate" class="org.springframework.orm.hibernate4.HibernateTemplate">
+    	<property name="sessionFactory" ref="sessionFactory"></property>
+	</bean>
+
+    <!-- 配置事物管理器，在*ServiceImpl里写@Transactional就可以启用事物管理 
+    <bean name="transactionManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+        <property name="sessionFactory" ref="sessionFactory"/>
+    </bean>-->
+    <bean id="transactionManager"
+		class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+	<tx:annotation-driven transaction-manager="transactionManager"   proxy-target-class="true"  />
+
+    
+
+
+    <bean id="schedulerFactoryBean" class="org.springframework.scheduling.quartz.SchedulerFactoryBean"/>
+</beans>
